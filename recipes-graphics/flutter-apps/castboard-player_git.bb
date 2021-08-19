@@ -81,6 +81,10 @@ do_install() {
     install -d ${D}${datadir}/${PN}/
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
 
+    # Rename exectuable to something sane because flutter-elinux uses the parent dir name, which in the case of this
+    # recipe is "git"
+    mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
+
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
 }
