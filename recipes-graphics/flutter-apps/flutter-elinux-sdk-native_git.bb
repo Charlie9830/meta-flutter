@@ -1,8 +1,5 @@
 SUMMARY = "Flutter for Embedded Linux"
-DESCRIPTION = "Flutter is Google's SDK for crafting beautiful, fast user experiences for \
-               mobile, web, and desktop from a single codebase. Flutter works with \
-               existing code, is used by developers and organizations around the world, \
-               and is free and open source."
+DESCRIPTION = "Sony flavour of the Flutter tools geared for Embedded Linux development"
 AUTHOR = "Sony"
 BUGTRACKER = "https://github.com/sony/flutter-elinux/issues"
 SECTION = "graphics"

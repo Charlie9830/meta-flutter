@@ -1,4 +1,4 @@
-SUMMARY = "Castboard Player build on Flutter-elinux"
+SUMMARY = "Castboard Player"
 DESCRIPTION = "Player for the Castboard software suite"
 AUTHOR = "Charlie Hall"
 HOMEPAGE = "https://github.com/charlie9830"
@@ -8,17 +8,7 @@ CVE_PRODUCT = ""
 
 LICENSE = "CLOSED"
 
-DEPENDS += "\
-	flutter-elinux-sdk-native \
-	unzip-native \
-	castboard-core \
-	castboard-remote \
-	glib-2.0 \
-	libinput libxkbcommon \
-	virtual/egl \
-	wayland wayland-native \
-	weston \
-	"
+DEPENDS += "flutter-engine flutter-sdk-native unzip-native castboard-core castboard-remote"
 
 # Castboard Remote Repository Revision
 CB_PLAYER_REV = "61ef2ed2d9a3ff0656e5cf3e39552da57d31bc13"
@@ -27,18 +17,25 @@ SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=
 
 S = "${WORKDIR}/git"
 
-TOOLCHAIN = "clang"
-
-inherit cmake
-
 do_patch() {
-    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/bin:$PATH
-    export PUB_CACHE=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/.pub-cache
+    export CURL_CA_BUNDLE=${STAGING_DIR_NATIVE}/etc/ssl/certs/ca-certificates.crt
+    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/bin:$PATH
+    export PUB_CACHE=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/.pub-cache
+
+    FLUTTER_VER="$( flutter --version | head -n 1 | awk '{print $2}' )"
+    echo "Flutter Version: ${FLUTTER_VER}"
 }
 
-do_patch[depends] += "flutter-elinux-sdk-native:do_populate_sysroot"
+do_patch[depends] += "flutter-sdk-native:do_populate_sysroot"
 
 do_configure() {
+    #
+    # Engine SDK
+    #
+    rm -rf ${S}/engine_sdk
+    unzip ${STAGING_DATADIR}/flutter/engine_sdk.zip -d ${S}/engine_sdk
+
+
     #
     # Castboard Core
     #
@@ -55,21 +52,19 @@ do_configure() {
 }
 
 do_compile() {
-    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/bin:$PATH
+    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/bin:$PATH
+
+    ENGINE_SDK=${S}/engine_sdk/sdk
 
     cd ${S}
-    
-    flutter-elinux create .
-    flutter-elinux pub get
-    flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET}
+
+    flutter build bundle
+
+    dart ${ENGINE_SDK}/frontend_server.dart.snapshot --aot --tfa --target=flutter --sdk-root ${ENGINE_SDK} --output-dill app.dill lib/main.dart 
+    ${ENGINE_SDK}/clang_x64/gen_snapshot --deterministic --snapshot_kind=app-aot-elf --elf=app.so --strip app.dill
 }
 
 do_install() {
-    #
-    # Flutter-elinux Layout
-    #
-    install -d ${D}${datadir}/${PN}/
-    cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
 
     #
     # Sony Layout
@@ -89,17 +84,17 @@ do_install() {
     #
     # Flutter-Pi Layout
     #
-    #install -d ${D}${datadir}/${PN}/
+    install -d ${D}${datadir}/${PN}/
     
-    #install -d ${D}${datadir}/${PN}/flutter_assets/
-    #install -m 644 ${S}/app.so ${D}${datadir}/${PN}/flutter_assets/
+    install -d ${D}${datadir}/${PN}/flutter_assets/
+    install -m 644 ${S}/app.so ${D}${datadir}/${PN}/flutter_assets/
     
-   # install -m 644 ${STAGING_DATADIR}/flutter/icudtl.dat ${D}${datadir}/${PN}/
+    install -m 644 ${STAGING_DATADIR}/flutter/icudtl.dat ${D}${datadir}/${PN}/
     
-    #cp -r ${S}/build/flutter_assets/* ${D}${datadir}/${PN}/flutter_assets/
+    cp -r ${S}/build/flutter_assets/* ${D}${datadir}/${PN}/flutter_assets/
 
     # Install the web_app Assets.
-    #cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/flutter_assets/assets/web_app/
+    cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/flutter_assets/assets/web_app/
 }
 
 FILES_${PN} = "${datadir}/${PN}/*"

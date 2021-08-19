@@ -8,7 +8,7 @@ CVE_PRODUCT = ""
 
 LICENSE = "CLOSED"
 
-DEPENDS += "flutter-engine flutter-sdk-native unzip-native"
+DEPENDS += "unzip-native"
 
 # Castboard Repository Revisions
 CB_CORE_REV = "cfa7432742205c4f672981b6fb18a296c5e36053"

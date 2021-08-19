@@ -1,5 +1,5 @@
 SUMMARY = "Castboard Remote"
-DESCRIPTION = "Remote Web Admin interface for the Castboard software suite. Built on flutter-elinux"
+DESCRIPTION = "Remote Web Admin interface for the Castboard software suite"
 AUTHOR = "Charlie Hall"
 HOMEPAGE = "https://github.com/charlie9830"
 BUGTRACKER = "https://github.com/charlie9830"
@@ -8,7 +8,7 @@ CVE_PRODUCT = ""
 
 LICENSE = "CLOSED"
 
-DEPENDS += "flutter-elinux-sdk-native unzip-native castboard-core"
+DEPENDS += "flutter-engine flutter-sdk-native unzip-native castboard-core"
 
 # Castboard Remote Repository Revision
 CB_REMOTE_REV = "00314e77d5ae08f945f365105cd3a5ba227d58f5"
@@ -19,13 +19,24 @@ SRC_URI = "git://github.com/Charlie9830/castboard_remote.git;protocol=https;rev=
 S = "${WORKDIR}/git"
 
 do_patch() {
-    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/bin:$PATH
-    export PUB_CACHE=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/.pub-cache
+    export CURL_CA_BUNDLE=${STAGING_DIR_NATIVE}/etc/ssl/certs/ca-certificates.crt
+    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/bin:$PATH
+    export PUB_CACHE=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/.pub-cache
+
+    FLUTTER_VER="$( flutter --version | head -n 1 | awk '{print $2}' )"
+    echo "Flutter Version: ${FLUTTER_VER}"
 }
 
-do_patch[depends] += "flutter-elinux-sdk-native:do_populate_sysroot"
+do_patch[depends] += "flutter-sdk-native:do_populate_sysroot"
 
 do_configure() {
+    #
+    # Engine SDK
+    #
+    rm -rf ${S}/engine_sdk
+    unzip ${STAGING_DATADIR}/flutter/engine_sdk.zip -d ${S}/engine_sdk
+
+
     #
     # Castboard Core
     #
@@ -34,11 +45,13 @@ do_configure() {
 }
 
 do_compile() {
-    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/bin:$PATH
+    export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter/sdk/bin:$PATH
+
+    ENGINE_SDK=${S}/engine_sdk/sdk
 
     cd ${S}
 
-    flutter-elinux build web --pwa-strategy=none
+    flutter build web --pwa-strategy=none
 
     # Extract the canvaskit url it wants to use.
     FLUTTER_CANVASKIT_URL="$( grep canvaskit-wasm ${S}/build/web/main.dart.js | sed -e 's|.*https|https|' -e 's|/bin.*|/bin/|' | uniq )"
