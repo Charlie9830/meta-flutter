@@ -12,7 +12,9 @@ DEPENDS += "curl-native unzip-native"
 
 SRC_URI = "git://github.com/sony/flutter-elinux.git;branch=main \ 
 	   file://ca-certificates.crt"
+
 SRCREV = "${AUTOREV}"
+#SRCREV = "073e2c265b437c049c2f7f38a3b1d70cb7071008"
 
 S = "${WORKDIR}/git"
 
@@ -33,6 +35,8 @@ do_install() {
 }
 
 FILES_${PN}-dev = "${datadir}/flutter-elinux/sdk/*"
+
+
 
 INSANE_SKIP_${PN}-dev = "already-stripped"
 

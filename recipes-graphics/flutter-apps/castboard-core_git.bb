@@ -10,10 +10,7 @@ LICENSE = "CLOSED"
 
 DEPENDS += "unzip-native"
 
-# Castboard Repository Revisions
-CB_CORE_REV = "cfa7432742205c4f672981b6fb18a296c5e36053"
-
-SRC_URI = "git://github.com/Charlie9830/castboard_core.git;protocol=https;lfs=0;branch=master;rev=${CB_CORE_REV};destsuffix=git"
+SRC_URI = "git://github.com/Charlie9830/castboard_core.git;protocol=https;lfs=0;branch=master;rev=${CASTBOARD_CORE_REV};destsuffix=git"
 
 S = "${WORKDIR}/git"
 

@@ -10,10 +10,7 @@ LICENSE = "CLOSED"
 
 DEPENDS += "flutter-elinux-sdk-native unzip-native castboard-core"
 
-# Castboard Remote Repository Revision
-CB_REMOTE_REV = "00314e77d5ae08f945f365105cd3a5ba227d58f5"
-
-SRC_URI = "git://github.com/Charlie9830/castboard_remote.git;protocol=https;rev=${CB_REMOTE_REV};lfs=0;branch=master;destsuffix=git"
+SRC_URI = "git://github.com/Charlie9830/castboard_remote.git;protocol=https;rev=${CASTBOARD_REMOTE_REV};lfs=0;branch=master;destsuffix=git"
 
 
 S = "${WORKDIR}/git"

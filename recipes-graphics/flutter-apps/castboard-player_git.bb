@@ -24,16 +24,12 @@ DEPENDS += "\
 	systemd \
 	"
 	
-# Likely temporary work around until offical DRM/GBM support comes online upstream from flutter-elinux.
-RDEPENDS_${PN} += "\
+DEPENDS += "\
 	wayland-protocols \
-	xkeyboard-config \
-	"
+	wayland-native \
+"
 
-# Castboard Remote Repository Revision
-CB_PLAYER_REV = "61ef2ed2d9a3ff0656e5cf3e39552da57d31bc13"
-
-SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CB_PLAYER_REV};branch=master;destsuffix=git"
+SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=master;destsuffix=git"
 
 S = "${WORKDIR}/git"
 
@@ -71,7 +67,12 @@ do_compile() {
     
     flutter-elinux create .
     flutter-elinux pub get
-    flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET} --target-backend-type=gbm
+    
+    # DRM Build
+    #flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET} --target-backend-type=gbm
+    
+    # Wayland Client Build
+    flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET}
 }
 
 do_install() {
