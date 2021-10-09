@@ -29,7 +29,13 @@ DEPENDS += "\
 	wayland-native \
 "
 
-SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=master;destsuffix=git"
+RDEPENDS_${PN} += "\
+    xkeyboard-config \
+    fontconfig \
+"
+
+CASTBOARD_PLAYER_BRANCH ?= "master"
+SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=${CASTBOARD_PLAYER_BRANCH};destsuffix=git"
 
 S = "${WORKDIR}/git"
 
@@ -69,6 +75,8 @@ do_compile() {
     flutter-elinux pub get
     
     # DRM Build
+    # Using the DRM Build is still a bit painful right now. Unable to get it to start correctly on boot.
+    # Only thing that works currently is setting a 20 second sleep in ExecStartPre which is pretty fragile.
     #flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET} --target-backend-type=gbm
     
     # Wayland Client Build
@@ -82,9 +90,8 @@ do_install() {
     install -d ${D}${datadir}/${PN}/
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
 
-    # Rename exectuable to something sane because flutter-elinux uses the parent dir name, which in the case of this
-    # recipe is "git"
-    mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
+    # Rename exectuable.
+    mv ${D}${datadir}/${PN}/castboard_player ${D}${datadir}/${PN}/player
 
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
