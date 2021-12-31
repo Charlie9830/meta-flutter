@@ -35,7 +35,8 @@ RDEPENDS_${PN} += "\
 "
 
 CASTBOARD_PLAYER_BRANCH ?= "master"
-SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=${CASTBOARD_PLAYER_BRANCH};destsuffix=git"
+SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=${CASTBOARD_PLAYER_BRANCH};destsuffix=git \
+		"
 
 S = "${WORKDIR}/git"
 
@@ -60,16 +61,25 @@ do_configure() {
     #
     # Castboard Remote
     #
-    # We only create the web_app folder now. We don't populate it yet. This is because the castboard-player pubspec.yaml only includes a listing for the web_app folder. Not all of the specific items inside it.
-    # If we include it now. When the app is compiled, it will ignore the directories inside the web_app folder because it doesn't know about them. Therefore we create a blank web_app directory now, so that 
-    # flutter won't complain that it can't find the asset. Then we will populate it in the install step.
+    # We only create the web_app folder now. We don't populate it yet. This is because the castboard-player pubspec.yaml only
+    # includes a listing for the web_app folder. Not all of the specific items inside it.
+    # If we all the subfiles and subdirectories of web_app now, when the app is compiled, it will ignore the directories
+    # inside the web_app folder because it doesn't know about them. Therefore we create a blank web_app directory now, so that 
+    # flutter won't complain that it can't find the asset.
     install -d ${S}/assets/web_app/
+    
+    # We then add in a temporary file to the web_app folder, this is because flutter will exclude blank directories from the
+    # final build bundle.
+    touch ${S}/assets/web_app/hold
 }
 
 do_compile() {
     export PATH=${STAGING_DIR_NATIVE}/usr/share/flutter-elinux/sdk/bin:$PATH
 
     cd ${S}
+    
+    rm -rf ./elinux
+    flutter-elinux clean
     
     flutter-elinux create .
     flutter-elinux pub get
@@ -91,12 +101,21 @@ do_install() {
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
 
     # Rename exectuable.
-    mv ${D}${datadir}/${PN}/castboard_player ${D}${datadir}/${PN}/player
+    mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
 
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
+    rm ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/hold # Remove the holding file we installed earlier.
+
 }
 
-FILES_${PN} = "${datadir}/${PN}/*"
+FILES_${PN} = " \
+	${datadir}/${PN}/* \
+    ${sysconfdir}/castboard/castboard.conf \
+"
+
+CONFFILES_${PN} = " \
+    ${sysconfdir}/castboard/castboard.conf \
+"
 
 do_package_qa[noexec] = "1"
