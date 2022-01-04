@@ -29,6 +29,10 @@ DEPENDS += "\
 	wayland-native \
 "
 
+DEPENDS += "\
+    cage-autorun \
+"
+
 RDEPENDS_${PN} += "\
     xkeyboard-config \
     fontconfig \
@@ -90,9 +94,15 @@ do_compile() {
     #flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET} --target-backend-type=gbm
     
     # Wayland Client Build
-    flutter-elinux build elinux --target-arch=arm64 --target-sysroot=${STAGING_DIR_TARGET}
+    flutter-elinux build elinux \
+    --dart-define=ELINUX_IS_ELINUX=true \
+    --dart-define=ELINUX_TMP_PATH=/tmp/ \
+    --dart-define=ELINUX_HOME_PATH=/home/cage \
+    --target-arch=arm64 \
+    --target-sysroot=${STAGING_DIR_TARGET}
 }
 
+do_install[depends] += "cage-autorun:do_install"
 do_install() {
     #
     # Flutter-elinux Layout
@@ -105,17 +115,18 @@ do_install() {
 
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
-    rm ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/hold # Remove the holding file we installed earlier.
-
+    # Remove the holding file we installed earlier.
+    rm ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/hold
+    
+    # Give permissive permssions to the castboard-player directory. So the updater can modify the files here.
+    chmod -R 777 ${D}${datadir}/${PN}/
 }
 
 FILES_${PN} = " \
 	${datadir}/${PN}/* \
-    ${sysconfdir}/castboard/castboard.conf \
 "
 
-CONFFILES_${PN} = " \
-    ${sysconfdir}/castboard/castboard.conf \
-"
+INSANE_SKIP_${PN}_append = "already-stripped"
+
 
 do_package_qa[noexec] = "1"
