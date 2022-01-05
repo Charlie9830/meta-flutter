@@ -107,10 +107,14 @@ do_install() {
     #
     # Flutter-elinux Layout
     #
+    # IMPORTANT!: If you change this layout, ensure you also modify the update validation methods in Castboard. It validates
+    # using the directory schema (bundle, data, executable) and executable name.
     install -d ${D}${datadir}/${PN}/
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
 
     # Rename exectuable.
+    # IMPORTANT!: If you change the executable name, ensure you also modify the update validation methods in Castboard.
+    # It validates using the directory schema (bundle, data, executable) and executeable name.
     mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
 
     # Install the web_app Assets.

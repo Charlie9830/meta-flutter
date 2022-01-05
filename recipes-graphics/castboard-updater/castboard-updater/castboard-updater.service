@@ -1,0 +1,11 @@
+[Unit]
+Description=Updater script for Castboard
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/castboard-updater/args.env
+ExecStart=/usr/bin/python3 /usr/share/castboard-updater/update.py $CASTBOARD_UPDATER_APP_PATH $CASTBOARD_UPDATER_UPDATE_SOURCE_PATH $CASTBOARD_UPDATER_CONF_PATH $CASTBOARD_UPDATER_APP_UNIT_NAME $CASTBOARD_UPDATER_ROLLBACK_PATH $CASTBOARD_UPDATER_OUTGOING_CODENAME $CASTBOARD_UPDATER_INCOMING_CODENAME
+User=root
+Group=root
+StandardOutput=journal+console
+StandardError=journal+console
