@@ -88,7 +88,6 @@ if not os.path.isdir(os.path.join(rollbackDirPath, outgoingCodename)):
 # Ensure our rollback directory is empty.
 subprocess.call("rm -rf " + os.path.join(rollbackDirPath, "*"), shell=True)
 
-
 # Setup dbus interfaces to systemd
 print("Setting up dbus connection to systemd...")
 bus = dbus.SystemBus()
@@ -113,12 +112,16 @@ stopApp(manager, unitName)
 print('Waiting for running instance of Castboard to shutdown...')
 time.sleep(5)
 
+print('\n \n \n')
+print("Oh dear, you have caught me in a state of undress! Avert your eyes this won't take long...")
+time.sleep(5)
+print('Any minute now...')
+time.sleep(3)
 
-print("Oh dear, you've caught me in a state of undress. Nevermind, this won't take long :)")
-# Move the contents of the App path to the recovery path + codename
+# Move the contents of the App path to the recovery path.
 try:
-    print('Moving ' + appPath + ' to ' + os.path.join(rollbackDirPath, outgoingCodename))
-    subprocess.call("mv " + os.path.join(appPath)+"*" + " " + os.path.join(rollbackDirPath, outgoingCodename), shell=True)
+    print('Moving ' + appPath + ' to ' + os.path.join(rollbackDirPath))
+    subprocess.call("mv -f " + os.path.join(appPath)+"*" + " " +rollbackDirPath, shell=True)
 except subprocess.SubprocessError as err:
     # Something failed write it to the output, leave a breadcrumb and try to recover.
     leaveBreadcrumb(updaterConfPath, 'failed')
@@ -129,10 +132,10 @@ try:
     # Copy the contents updatePath to the appPath. We can't copy the directory itself as we likely don't have
     # permissions to modify the /usr/share/ parent directory
     print('Copying ' + updateSourcePath + " to " + appPath)
-    subprocess.call("cp -rf " + os.path.join(updateSourcePath)+"*" + " " + appPath, shell=True)
+    subprocess.call("cp -rf " + os.path.join(updateSourcePath)+"/*" + " " + appPath, shell=True)
 
-    # Ensure the directory has the correct permissions.
-    subprocess.call("chmod -R 777 " + os.path.join(updateSourcePath), shell=True)
+    # Ensure the contents of the has the correct permissions.
+    subprocess.call("chmod -R 777 " + os.path.join(appPath)+"/*", shell=True)
 except subprocess.SubprocessError as err:
     # Something failed write it to the output, leave a breadcrumb and try to recover.
     leaveBreadcrumb(updaterConfPath, 'failed')

@@ -107,23 +107,35 @@ do_install() {
     #
     # Flutter-elinux Layout
     #
-    # IMPORTANT!: If you change this layout, ensure you also modify the update validation methods in Castboard. It validates
+    #     !!!  IMPORTANT   !!!
+    # If you change this layout, ensure you also modify the update validation methods in Castboard. It validates
     # using the directory schema (bundle, data, executable) and executable name.
     install -d ${D}${datadir}/${PN}/
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
+    chmod -R 775 ${D}${datadir}/${PN}/*
+    
+
+    # Extract the versionCodename from the sourcecode.
+    CASTBOARD_BUILD_CODENAME=$(grep -P -o "(?<=kVersionCodename = [\"|\'])[a-zA-Z]+" ${S}/lib/versionCodename.dart)
+
+    # Write the code to the /codename
+    echo $CASTBOARD_BUILD_CODENAME > ${D}${datadir}/${PN}/codename
+    chmod 775 ${D}${datadir}/${PN}/codename
 
     # Rename exectuable.
-    # IMPORTANT!: If you change the executable name, ensure you also modify the update validation methods in Castboard.
+    #
+    #     !!!  IMPORTANT   !!!
+    #
+    # If you change the executable name, ensure you also modify the update validation methods in Castboard.
     # It validates using the directory schema (bundle, data, executable) and executeable name.
     mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
 
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
+    chmod -R 775 ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/*
+
     # Remove the holding file we installed earlier.
     rm ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/hold
-    
-    # Give permissive permssions to the castboard-player directory. So the updater can modify the files here.
-    chmod -R 777 ${D}${datadir}/${PN}/
 }
 
 FILES_${PN} = " \
