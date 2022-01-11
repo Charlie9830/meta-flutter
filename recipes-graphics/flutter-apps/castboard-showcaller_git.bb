@@ -1,5 +1,5 @@
-SUMMARY = "Castboard Remote"
-DESCRIPTION = "Remote Web Admin interface for the Castboard software suite. Built on flutter-elinux"
+SUMMARY = "Castboard Showcaller"
+DESCRIPTION = "Remote Web Admin interface for the Castboard software suite"
 AUTHOR = "Charlie Hall"
 HOMEPAGE = "https://github.com/charlie9830"
 BUGTRACKER = "https://github.com/charlie9830"
@@ -10,7 +10,7 @@ LICENSE = "CLOSED"
 
 DEPENDS += "flutter-elinux-sdk-native unzip-native castboard-core"
 
-SRC_URI = "git://github.com/Charlie9830/castboard_remote.git;protocol=https;rev=${CASTBOARD_REMOTE_REV};lfs=0;branch=master;destsuffix=git"
+SRC_URI = "git://github.com/Charlie9830/castboard_showcaller.git;protocol=https;rev=${CASTBOARD_SHOWCALLER_REV};lfs=0;branch=master;destsuffix=git"
 
 
 S = "${WORKDIR}/git"

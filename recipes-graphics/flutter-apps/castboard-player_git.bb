@@ -12,7 +12,7 @@ DEPENDS += "\
 	flutter-elinux-sdk-native \
 	unzip-native \
 	castboard-core \
-	castboard-remote\
+	castboard-showcaller\
 	glib-2.0 \
 	libinput \
 	libxkbcommon \
@@ -63,7 +63,7 @@ do_configure() {
     cp -r ${STAGING_DATADIR}/castboard-core/* ${WORKDIR}/castboard_core/
 
     #
-    # Castboard Remote
+    # Castboard Showcaller
     #
     # We only create the web_app folder now. We don't populate it yet. This is because the castboard-player pubspec.yaml only
     # includes a listing for the web_app folder. Not all of the specific items inside it.
@@ -126,12 +126,12 @@ do_install() {
     #
     #     !!!  IMPORTANT   !!!
     #
-    # If you change the executable name, ensure you also modify the update validation methods in Castboard.
-    # It validates using the directory schema (bundle, data, executable) and executeable name.
+    # If you change the executable name, ensure you also update the validation methods in Castboard.
+    # It validates using the directory schema (bundle, data, executable) and executable name.
     mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
 
     # Install the web_app Assets.
-    cp -r ${STAGING_DATADIR}/castboard-remote/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
+    cp -r ${STAGING_DATADIR}/castboard-showcaller/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
     chmod -R 775 ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/*
 
     # Remove the holding file we installed earlier.
