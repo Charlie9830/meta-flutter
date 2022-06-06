@@ -1,4 +1,4 @@
-SUMMARY = "Castboard Player"
+SUMMARY = "Castboard Performer"
 DESCRIPTION = "Player for the Castboard software suite built on flutter-elinux"
 AUTHOR = "Charlie Hall"
 HOMEPAGE = "https://github.com/charlie9830"
@@ -36,10 +36,11 @@ DEPENDS += "\
 RDEPENDS_${PN} += "\
     xkeyboard-config \
     fontconfig \
+    liberation-fonts \
 "
 
-CASTBOARD_PLAYER_BRANCH ?= "master"
-SRC_URI = "git://github.com/Charlie9830/castboard_player.git;protocol=https;rev=${CASTBOARD_PLAYER_REV};branch=${CASTBOARD_PLAYER_BRANCH};destsuffix=git \
+CASTBOARD_PERFORMER_BRANCH ?= "master"
+SRC_URI = "git://github.com/Charlie9830/castboard_performer.git;protocol=https;rev=${CASTBOARD_PERFORMER_REV};branch=${CASTBOARD_PERFORMER_BRANCH};destsuffix=git \
 		"
 
 S = "${WORKDIR}/git"
@@ -65,7 +66,7 @@ do_configure() {
     #
     # Castboard Showcaller
     #
-    # We only create the web_app folder now. We don't populate it yet. This is because the castboard-player pubspec.yaml only
+    # We only create the web_app folder now. We don't populate it yet. This is because the castboard-performer pubspec.yaml only
     # includes a listing for the web_app folder. Not all of the specific items inside it.
     # If we all the subfiles and subdirectories of web_app now, when the app is compiled, it will ignore the directories
     # inside the web_app folder because it doesn't know about them. Therefore we create a blank web_app directory now, so that 
@@ -128,7 +129,7 @@ do_install() {
     #
     # If you change the executable name, ensure you also update the validation methods in Castboard.
     # It validates using the directory schema (bundle, data, executable) and executable name.
-    mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/player
+    mv ${D}${datadir}/${PN}/git ${D}${datadir}/${PN}/performer
 
     # Install the web_app Assets.
     cp -r ${STAGING_DATADIR}/castboard-showcaller/web/* ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/
