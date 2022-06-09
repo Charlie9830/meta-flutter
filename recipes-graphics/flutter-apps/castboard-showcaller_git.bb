@@ -51,6 +51,9 @@ do_compile() {
     # Manually change references to the engine URL in the build output.
     sed -i -e "s!${FLUTTER_CANVASKIT_URL}!/!g" ${S}/build/web/main.dart.js
 
+    # Install timestamp of the current Showcaller Git Commit into build directory.
+    git show -s --format=%ci > ${S}/build/web/timestamp
+
 }
 
 do_install() {
