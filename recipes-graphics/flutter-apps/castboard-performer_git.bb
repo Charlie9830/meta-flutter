@@ -114,7 +114,6 @@ do_install() {
     install -d ${D}${datadir}/${PN}/
     cp -rTv ${S}/build/elinux/arm64/release/bundle/. ${D}${datadir}/${PN}/
     chmod -R 775 ${D}${datadir}/${PN}/*
-    
 
     # Extract the versionCodename from the sourcecode.
     CASTBOARD_BUILD_CODENAME=$(grep -P -o "(?<=kVersionCodename = [\"|\'])[a-zA-Z]+" ${S}/lib/versionCodename.dart)
@@ -137,6 +136,11 @@ do_install() {
 
     # Remove the holding file we installed earlier.
     rm ${D}${datadir}/${PN}/data/flutter_assets/assets/web_app/hold
+
+    # Ensure the Cage user is the owner of all installed files and directories. Although we set liberal file mode,
+    # only the owner can do things such as change the Modified time of a file to specific timestamp. We do that
+    # in order to adjust the File modified times of the web_app directory.
+    chown cage -R ${D}${datadir}/${PN}
 }
 
 FILES_${PN} = " \

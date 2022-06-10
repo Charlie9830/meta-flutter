@@ -81,12 +81,9 @@ if not os.path.isdir(appPath):
 if not os.path.isdir(rollbackDirPath):
     subprocess.call("mkdir " + rollbackDirPath, shell=True)
 
-# Ensure a directory for our outgoing codename exists.
-if not os.path.isdir(os.path.join(rollbackDirPath, outgoingCodename)):
-    subprocess.call("mkdir " + os.path.join(rollbackDirPath, outgoingCodename), shell=True)
-
 # Ensure our rollback directory is empty.
 subprocess.call("rm -rf " + os.path.join(rollbackDirPath, "*"), shell=True)
+
 
 # Setup dbus interfaces to systemd
 print("Setting up dbus connection to systemd...")
@@ -120,8 +117,8 @@ time.sleep(3)
 
 # Move the contents of the App path to the recovery path.
 try:
-    print('Moving ' + appPath + ' to ' + os.path.join(rollbackDirPath))
-    subprocess.call("mv -f " + os.path.join(appPath)+"*" + " " +rollbackDirPath, shell=True)
+    print('Moving ' + appPath + ' to ' + rollbackDirPath)
+    subprocess.call("mv -f " + os.path.join(appPath, "*") + " " + rollbackDirPath, shell=True)
 except subprocess.SubprocessError as err:
     # Something failed write it to the output, leave a breadcrumb and try to recover.
     leaveBreadcrumb(updaterConfPath, 'failed')
@@ -132,10 +129,14 @@ try:
     # Copy the contents updatePath to the appPath. We can't copy the directory itself as we likely don't have
     # permissions to modify the /usr/share/ parent directory
     print('Copying ' + updateSourcePath + " to " + appPath)
-    subprocess.call("cp -rf " + os.path.join(updateSourcePath)+"/*" + " " + appPath, shell=True)
+    subprocess.call("cp -rf " + os.path.join(updateSourcePath, "*") + " " + appPath, shell=True)
 
-    # Ensure the contents of the has the correct permissions.
-    subprocess.call("chmod -R 777 " + os.path.join(appPath)+"/*", shell=True)
+    # Ensure the contents of the directory has the correct permissions...
+    subprocess.call("chmod -R 777 " + os.path.join(appPath, "*"), shell=True)
+    
+    # And is owned by the Cage User.
+    subprocess.call("chown cage:cage -R " + os.path.join(appPath, "*"), shell=True)
+
 except subprocess.SubprocessError as err:
     # Something failed write it to the output, leave a breadcrumb and try to recover.
     leaveBreadcrumb(updaterConfPath, 'failed')
