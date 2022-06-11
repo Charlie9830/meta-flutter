@@ -1,0 +1,36 @@
+[Unit]
+Description=Cage Wayland compositor on %I running Castboard Performer
+After=systemd-user-sessions.service plymouth-quit-wait.service
+Before=graphical.target
+ConditionPathExists=/dev/tty0
+Wants=dbus.socket systemd-logind.service
+After=dbus.socket systemd-logind.service
+Conflicts=getty@%i.service
+After=getty@%i.service
+
+[Service]
+Type=simple
+Environment=WLR_LIBINPUT_NO_DEVICES=1
+ExecStart=/usr/bin/python3 /usr/bin/launch_castboard.py /usr/share/castboard-performer/performer /etc/castboard/castboard.conf
+StandardOutput=journal+console
+StandardOutput=journal+console
+StandardError=journal+console
+KillSignal=SIGKILL
+RestartKillSignal=SIGKILL
+
+User=cage
+UtmpIdentifier=%I
+UtmpMode=user
+TTYPath=/dev/%I
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+StandardInput=tty-fail
+
+# Set up a full (custom) user session for the user, required by Cage.
+PAMName=cage
+
+[Install]
+WantedBy=graphical.target
+Alias=display-manager.service
+DefaultInstance=tty7
