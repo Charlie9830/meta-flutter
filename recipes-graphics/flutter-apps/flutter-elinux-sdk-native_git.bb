@@ -13,20 +13,8 @@ DEPENDS += "curl-native unzip-native"
 SRC_URI = "git://github.com/sony/flutter-elinux.git;branch=main \ 
 	   file://ca-certificates.crt"
 
-#
-# Version Note
-#
-# We have to stay on 2.5.3 until the following issue is resolved.
-# -	https://github.com/sony/flutter-elinux/issues/70
-
-# Latest
-#SRCREV = "${AUTOREV}"
-
-# Version 2.8.0
-#SRCREV = "0e4107e829eced475395dc4e11e4a76b49c5f30e"
-
-# Version 2.5.3
-SRCREV = "fad1d30ae7accef627a98df7d201a59a649f5c2a"
+# Flutter-elinux Version 3.0.3
+SRCREV = "425fba6a810fcc0169f7a4a45a054fd0b17e9afa"
 
 S = "${WORKDIR}/git"
 

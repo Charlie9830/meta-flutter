@@ -16,7 +16,7 @@ def extractValue(input):
 file = open(confLocation, 'r')
 Lines = file.readlines()
  
-cageArgs = ""
+cageArgs = []
 
 for line in Lines:
     deviceRotationMatch = re.search('deviceRotation=\d', line)
@@ -24,24 +24,20 @@ for line in Lines:
         # Found the matching line. Extra the value and set cageArgs accordingly
         value = extractValue(deviceRotationMatch.string)
         if value == '90':
-            cageArgs += "-r"
+            cageArgs = ["-r"]
         
         if value == '180':
-            cageArgs += "-r -r"
+            cageArgs = ["-r", "-r"]
 
         if value == "270":
-            cageArgs += "-r -r -r"
+            cageArgs = ["-r", "-r", "-r"]
 
 # If subprocess.call has empty args, it freaks out cage. So if we have no -r args to provide, we have to make sure
 # we don't leave an empty string in the args paramter.
-if cageArgs == "":
-    subprocess.call(["/usr/bin/cage", "/usr/share/castboard-performer/performer"])
+
+# Cage command detail...
+# Cage requires a "--" in its command if you need to provide arguments for the Application running inside Cage. 
+if len(cageArgs) == 0:
+    subprocess.call(["/usr/bin/cage", "--", "/usr/share/castboard-performer/performer", "--bundle=/usr/share/castboard-performer/"])
 else:
-    subprocess.call(["/usr/bin/cage", cageArgs, "/usr/share/castboard-performer/performer"])
-
-
-
-    
-    
-
-
+    subprocess.call(["/usr/bin/cage"] + cageArgs + ["--", "/usr/share/castboard-performer/performer", "--bundle=/usr/share/castboard-performer/"])
